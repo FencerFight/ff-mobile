@@ -18,6 +18,6 @@ export default function Section({ title, children }: SectionProps) {
 };
 
 const styles = StyleSheet.create({
-  section: { backgroundColor: SURFACE, borderRadius: 16, padding: 16, marginBottom: 24 },
+  section: { backgroundColor: SURFACE, borderRadius: 16, padding: 16, marginBottom: 15, gap: 8 },
   title:   { color: FG, fontSize: 18, marginBottom: 12, fontFamily: "IBMPlexSansBold" },
 });

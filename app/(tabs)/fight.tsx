@@ -6,9 +6,6 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Button from '@/components/Button';
 import Counter from '@/components/Counter';
 import { ACCENT, BG, FG, STORAGE_PREFIX } from '@/constants';
-import { truncateFullName } from '@/utils/helpers';
-import { incWin } from '@/utils/incWin';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   currentPairIndexAtom,
   doubleHitsAtom,
@@ -22,7 +19,10 @@ import {
   timeLeftAtom,
   warnings1Atom,
   warnings2Atom
-} from '@store';
+} from '@/store';
+import { truncateFullName } from '@/utils/helpers';
+import { incWin } from '@/utils/incWin';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import I18n from '@utils/i18n';
 import { Minus, Pause, Play, RefreshCw, Trophy } from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
@@ -185,7 +185,7 @@ export default function FightScreen() {
         }
       ].map((data, i)=>(
         <View style={[styles.side, data.styleWrap]} key={i}>
-          <Text style={styles.name}>{truncateFullName(data?.name, 19).replace(/ /g, '\n')}</Text>
+          <Text style={styles.name}>{truncateFullName(String(data.name), 19).replace(/ /g, '\n')}</Text>
           <Text style={styles.score}>{data.score}</Text>
 
           {Object.entries(hitZones).map(([zone, pts]) => (

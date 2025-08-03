@@ -8,8 +8,9 @@
       ],
       "@utils/*": ["./utils/*"],
       "@components/*": ["./components/*"],
-      "@store": ["./store/index.ts"],
-      "@assets": ["./assets/*"],
+      "@constants/*": ["./constants/*"],
+      "@store/*": ["./store/*"],
+      "@assets/*": ["./assets/*"],
 
     }
   },

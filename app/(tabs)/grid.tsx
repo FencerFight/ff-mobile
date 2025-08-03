@@ -1,10 +1,10 @@
 import Button from '@/components/Button';
 import DataTable from '@/components/DataTable';
 import { FG } from '@/constants';
+import { currentPairIndexAtom, duelsAtom, fighterPairsAtom, ParticipantType, sameGenderOnlyAtom } from "@/store";
 import { exportExcel } from '@/utils/exportExcel';
 import { generatePairs } from '@/utils/generatePairs';
 import { truncate } from '@/utils/helpers';
-import { currentPairIndexAtom, duelsAtom, fighterPairsAtom, ParticipantType, sameGenderOnlyAtom } from '@store';
 import I18n from '@utils/i18n';
 import { useAtom } from 'jotai';
 import { Share2 } from 'lucide-react-native';

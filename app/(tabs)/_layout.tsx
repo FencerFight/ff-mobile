@@ -2,7 +2,7 @@ import React from 'react';
 
 import { ACCENT, FG } from '@/constants';
 import { Tabs } from 'expo-router';
-import { Settings, Swords, Table } from 'lucide-react-native';
+import { Network, Settings, Swords, Timer, Trophy, UserRound, Vote } from 'lucide-react-native';
 import { Platform, StyleProp, ViewStyle } from 'react-native';
 
 export default function TabLayout() {
@@ -29,13 +29,37 @@ export default function TabLayout() {
       <Tabs.Screen
         name="fight"
         options={{
-          tabBarIcon: ({ focused }) => <Swords size={28} color={focused ? ACCENT : FG} style={commonStyle} />,
+          tabBarIcon: ({ focused }) => <Timer size={28} color={focused ? ACCENT : FG} style={commonStyle} />,
         }}
       />
       <Tabs.Screen
         name="grid"
         options={{
-          tabBarIcon: ({ focused }) => <Table size={28} color={focused ? ACCENT : FG} style={commonStyle} />,
+          tabBarIcon: ({ focused }) => <Network size={28} color={focused ? ACCENT : FG} style={commonStyle} />,
+        }}
+      />
+      <Tabs.Screen
+        name="tournament"
+        options={{
+          tabBarIcon: ({ focused }) => <Swords size={28} color={focused ? ACCENT : FG} style={commonStyle} />,
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          tabBarIcon: ({ focused }) => <UserRound size={28} color={focused ? ACCENT : FG} style={commonStyle} />,
+        }}
+      />
+      <Tabs.Screen
+        name="rating"
+        options={{
+          tabBarIcon: ({ focused }) => <Trophy size={28} color={focused ? ACCENT : FG} style={commonStyle} />,
+        }}
+      />
+      <Tabs.Screen
+        name="voting"
+        options={{
+          tabBarIcon: ({ focused }) => <Vote size={28} color={focused ? ACCENT : FG} style={commonStyle} />,
         }}
       />
     </Tabs>

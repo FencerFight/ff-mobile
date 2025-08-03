@@ -6,7 +6,7 @@ import { StyleSheet, Text, TouchableOpacity, ViewStyle } from 'react-native';
 interface ButtonProps {
   title?: string;
   children?: ReactNode
-  onPress: () => void;
+  onPress?: () => void;
   style?: ViewStyle;
   stroke?: boolean;
   disabled?: boolean;

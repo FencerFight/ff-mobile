@@ -21,34 +21,34 @@ export default function RootLayout() {
   }
 
   return (
-    <Provider>
-      <ThemeProvider value={DarkTheme}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-        <StatusBar style="auto" translucent backgroundColor="transparent" />
-      </ThemeProvider>
-    <Toast config={{
-      info: (props)=><BaseToast
-                    {...props}
-                    style={{ height: 100, borderLeftColor: FG, backgroundColor: SURFACE }}
-                    text1Style={[{ color: ACCENT, fontSize: 15, fontFamily: "IBMPlexSansMedium" }, props.text1Style]}
-                    text2Style={[{ color: FG, fontSize: 15, fontFamily: "IBMPlexSansMedium" }, props.text2Style]}
-                    />,
-      success: (props)=><BaseToast
-                        {...props}
-                        style={{ backgroundColor: SURFACE, borderLeftColor: FG }}
-                        text1Style={{ fontSize: 15, fontFamily: "IBMPlexSansMedium", color: FG }}
-                        text2Style={{ fontSize: 15, fontFamily: "IBMPlexSansMedium", color: FG }}
-                        />,
-      error: (props)=><BaseToast
+      <Provider>
+        <ThemeProvider value={DarkTheme}>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+          <StatusBar style="auto" translucent backgroundColor="transparent" />
+        </ThemeProvider>
+      <Toast config={{
+        info: (props)=><BaseToast
                       {...props}
-                      style={{ backgroundColor: SURFACE, borderLeftColor: ACCENT }}
-                      text1Style={{ fontSize: 15, fontFamily: "IBMPlexSansMedium", color: ACCENT }}
-                      text2Style={{ fontSize: 15, fontFamily: "IBMPlexSansMedium", color: FG }}
-                      /> }}
-    />
-    </Provider>
+                      style={{ height: 100, borderLeftColor: FG, backgroundColor: SURFACE }}
+                      text1Style={[{ color: ACCENT, fontSize: 15, fontFamily: "IBMPlexSansMedium" }, props.text1Style]}
+                      text2Style={[{ color: FG, fontSize: 15, fontFamily: "IBMPlexSansMedium" }, props.text2Style]}
+                      />,
+        success: (props)=><BaseToast
+                          {...props}
+                          style={{ backgroundColor: SURFACE, borderLeftColor: FG }}
+                          text1Style={{ fontSize: 15, fontFamily: "IBMPlexSansMedium", color: FG }}
+                          text2Style={{ fontSize: 15, fontFamily: "IBMPlexSansMedium", color: FG }}
+                          />,
+        error: (props)=><BaseToast
+                        {...props}
+                        style={{ backgroundColor: SURFACE, borderLeftColor: ACCENT }}
+                        text1Style={{ fontSize: 15, fontFamily: "IBMPlexSansMedium", color: ACCENT }}
+                        text2Style={{ fontSize: 15, fontFamily: "IBMPlexSansMedium", color: FG }}
+                        /> }}
+      />
+      </Provider>
   );
 }

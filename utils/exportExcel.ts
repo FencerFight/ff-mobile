@@ -1,4 +1,4 @@
-import { ParticipantType } from '@store';
+import { ParticipantType } from '@/store';
 import I18n from '@utils/i18n';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';

@@ -4,30 +4,32 @@ import * as FileSystem from 'expo-file-system';
 import { useAtom } from 'jotai';
 import { CloudDownload, Mars, Plus, RefreshCw, Save, Trash2, Venus } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { TimerPicker } from 'react-native-timer-picker';
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { TimerPickerModal } from 'react-native-timer-picker';
 import Toast from 'react-native-toast-message';
 
 import Button from '@/components/Button';
+import { GenderSwitch } from '@/components/GenderSwitch';
 import Section from '@/components/Section';
-import ToastCustom from '@/components/ToastCustom';
+import SwitchFF from '@/components/SwitchFF';
 import { ACCENT, ACCENT_TRANSPARENT, BG, FG, langLabels, PLACEHOLDER, STORAGE_PREFIX, SURFACE } from '@/constants';
 import { useAppUpdate } from '@/hooks/useAppUpdate';
-import { generatePairs } from '@/utils/generatePairs';
-import { onlySurname } from '@/utils/helpers';
 import {
   currentPairIndexAtom,
   duelsAtom,
   fighterPairsAtom,
   fightTimeAtom,
   fightTimeDefault,
+  Gender,
   hitZonesAtom,
   hitZonesDefault,
   languageAtom,
   ParticipantType,
   sameGenderOnlyAtom,
   soundsUpdateAtom
-} from '@store';
+} from '@/store';
+import { generatePairs } from '@/utils/generatePairs';
+import { onlySurname } from '@/utils/helpers';
 import I18n from '@utils/i18n';
 
 export default function SettingsScreen() {
@@ -46,7 +48,7 @@ export default function SettingsScreen() {
   /* ---------- состояние ---------- */
   const [newName, setNewName] = useState('');
   const [participants, setParticipants] = useState<ParticipantType[]>([]);
-  const [newGender, setNewGender] = useState<'M' | 'F'>('M');
+  const [gender, setGender] = useState<Gender>(Gender.Male);
   const [showPicker, setShowPicker] = useState(false);
 
   /* ---------- загрузка ---------- */
@@ -85,7 +87,7 @@ export default function SettingsScreen() {
   const addParticipant = () => {
     const name = newName.trim();
     if (!name) return;
-    setParticipants([...participants, { name, gender: newGender, win: 0 }]);
+    setParticipants([...participants, { name, gender, win: 0 }]);
     setNewName('');
   };
   const removeParticipant = (idx: number) =>
@@ -168,7 +170,7 @@ export default function SettingsScreen() {
     })
   }
 
-  const getName = (name: string)=> name.length <= 14 ? name : onlySurname(name, 14)
+  const getName = (name: string) => name.length <= 14 ? name : onlySurname(name, 14)
 
   useEffect(()=>{
     if (showUpdateBtn) {
@@ -191,7 +193,6 @@ export default function SettingsScreen() {
   }, []);
 
   return (
-    <>
     <ScrollView key={language}style={styles.container} contentContainerStyle={styles.content}>
       {/* Кнопка смены языка */}
       <View style={styles.langRow}>
@@ -212,14 +213,7 @@ export default function SettingsScreen() {
           returnKeyType="done"
         />
 
-        <View style={styles.genderRow}>
-          <TouchableOpacity onPress={() => setNewGender('M')} style={[styles.genderBtn, newGender === 'M' && styles.genderActive]}>
-            <Mars size={28} color={FG} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setNewGender('F')} style={[styles.genderBtn, newGender === 'F' && styles.genderActive]}>
-            <Venus size={28} color={FG} />
-          </TouchableOpacity>
-        </View>
+        <GenderSwitch gender={gender} setGender={setGender} />
 
         <Button style={styles.addBtn} onPress={addParticipant}>
           <Plus size={28} color={FG} />
@@ -228,8 +222,10 @@ export default function SettingsScreen() {
         {participants.map((p, idx) => (
           <View key={idx} style={styles.participantRow}>
             <Text style={styles.participantTxt}>{p.name}</Text>
-            {p.gender === "M" ?
-              <Mars size={15} color={FG} style={{ marginLeft: -125}} /> : <Venus size={15} color={FG} style={{ marginLeft: -125}} />}
+            {p.gender === Gender.Male ?
+              <Mars size={15} color={FG} style={{ marginLeft: -125}} /> :
+              <Venus size={15} color={FG} style={{ marginLeft: -125}} />
+            }
             <TouchableOpacity onPress={() => removeParticipant(idx)}>
               <Trash2 size={22} color={FG} />
             </TouchableOpacity>
@@ -239,23 +235,15 @@ export default function SettingsScreen() {
         <View style={styles.genderRow}>
           <View style={[styles.genderRow, { marginVertical: 0 }]}>
             <Mars size={28} color={FG} />
-            <Text style={styles.countTxt}>{participants.filter(p => p.gender === 'M').length}</Text>
+            <Text style={styles.countTxt}>{participants.filter(p => p.gender === Gender.Male).length}</Text>
           </View>
           <View style={[styles.genderRow, { marginVertical: 0, marginLeft: 30 }]}>
             <Venus size={28} color={FG} />
-            <Text style={styles.countTxt}>{participants.filter(p => p.gender === 'F').length}</Text>
+            <Text style={styles.countTxt}>{participants.filter(p => p.gender === Gender.Female).length}</Text>
           </View>
         </View>
 
-        <View style={styles.switchRow}>
-          <Text style={styles.switchLabel}>{I18n.t('sameGenderPairs')}</Text>
-          <Switch
-            value={sameGenderOnly}
-            onValueChange={setSameGenderOnly}
-            trackColor={{ false: '#767577', true: ACCENT }}
-            thumbColor={sameGenderOnly ? FG : '#f4f3f4'}
-          />
-        </View>
+        <SwitchFF title={I18n.t('sameGenderPairs')} value={sameGenderOnly} setValue={setSameGenderOnly} />
 
         <Button style={{ marginTop: 10 }} onPress={genPairs} title={I18n.t('randomizePairs')} stroke />
       </Section>
@@ -280,6 +268,54 @@ export default function SettingsScreen() {
         <Button
           title={I18n.t('editTime')}
           onPress={() => setShowPicker(true)}
+        />
+          <TimerPickerModal
+          hideHours
+          visible={showPicker}
+          setIsVisible={setShowPicker}
+          onConfirm={({ minutes, seconds }) => {
+              setFightTime(minutes * 60 + seconds);
+              setShowPicker(false)
+          }}
+          modalTitle={I18n.t('fightDuration')}
+          closeOnOverlayPress
+          confirmButtonText='OK'
+          buttonContainerProps={{ style: { backgroundColor: ACCENT } }}
+          initialValue={{
+            minutes: Math.floor(fightTime / 60),
+            seconds: fightTime % 60,
+          }}
+          LinearGradient={null}
+          styles={{
+            theme: 'dark',
+            backgroundColor: SURFACE,
+            pickerContainer: {
+              justifyContent: "center",
+            },
+            pickerItem: {
+              color: FG,
+              fontSize: 22,
+              fontFamily: "IBMPlexSansRegular"
+            },
+            pickerLabel: {
+              color: FG,
+              fontSize: 16,
+              fontFamily: "IBMPlexSansRegular"
+            },
+            button: {
+              backgroundColor: ACCENT
+            },
+            confirmButton: {
+              fontFamily: "IBMPlexSansSemiBold",
+              backgroundColor: ACCENT,
+              borderWidth: 0
+            },
+            cancelButton: {
+              fontFamily: "IBMPlexSansSemiBold",
+              borderColor: ACCENT,
+              backgroundColor: SURFACE
+            }
+          }}
         />
       </Section>
 
@@ -320,38 +356,6 @@ export default function SettingsScreen() {
         }
       </Section>
     </ScrollView>
-    {/* --- Toast с TimePiker --- */}
-    <ToastCustom visible={showPicker} onClose={()=>setShowPicker(false)}>
-        <TimerPicker
-          hideHours
-          onDurationChange={({ minutes, seconds }) => {
-            setFightTime(minutes * 60 + seconds);
-          }}
-          initialValue={{
-            minutes: Math.floor(fightTime / 60),
-            seconds: fightTime % 60,
-          }}
-          LinearGradient={null}
-          styles={{
-            theme: 'dark',
-            backgroundColor: SURFACE,
-            pickerContainer: {
-              justifyContent: "center",
-            },
-            pickerItem: {
-              color: FG,
-              fontSize: 22,
-              fontFamily: "IBMPlexSansRegular"
-            },
-            pickerLabel: {
-              color: FG,
-              fontSize: 16,
-              fontFamily: "IBMPlexSansRegular"
-            },
-          }}
-        />
-    </ToastCustom>
-    </>
   );
 }
 
@@ -381,8 +385,7 @@ const styles = StyleSheet.create({
   genderBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6, marginRight: 8 },
   genderActive: { backgroundColor: ACCENT },
 
-  switchRow: { flexDirection: 'row', alignItems: 'center' },
-  switchLabel: { color: FG, flex: 1, fontFamily: "IBMPlexSansRegular", marginTop: -5 },
+
 
   countTxt: { color: FG, fontSize: 16, marginLeft: 10, fontFamily: "IBMPlexSansBold" },
 });

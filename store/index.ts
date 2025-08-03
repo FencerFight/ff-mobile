@@ -1,6 +1,19 @@
+// store.ts
 import { atom } from 'jotai';
 
 export const fightTimeDefault = 180;
+export const hitZonesDefault = {
+  head: 3,
+  torso: 2,
+  arms: 2,
+  legs: 1
+}
+
+export enum Gender {
+  Male,
+  Female
+}
+export type ParticipantType = { name: string; gender: Gender, win: number };
 
 // Основные атомы таймера
 export const fightTimeAtom = atom(fightTimeDefault); // Время боя в секундах (по умолчанию 3 минуты)
@@ -19,24 +32,18 @@ export const protests2Atom = atom(0); // Флаг учета протестов 
 export const warnings1Atom = atom(0); // Счетчик предупреждений для бойца 1
 export const warnings2Atom = atom(0); // Счетчик предупреждений для бойца 2
 
-export type ParticipantType = { name: string; gender: 'M' | 'F', win: number };
 
 // Атомы для управления парами бойцов
 export const fighterPairsAtom = atom<ParticipantType[][]>([
   // Массив пар бойцов по умолчанию
-  [{ name: 'Fighter A', gender: "M", win: 0}, { name: 'Fighter B', gender: "M", win: 0 }],
-  [{ name: 'Fighter C', gender: "F", win: 0 }, { name: 'Fighter D', gender: "F", win: 0 }]
+  [{ name: 'Fighter A', gender: Gender.Male, win: 0}, { name: 'Fighter B', gender: Gender.Male, win: 0 }],
+  [{ name: 'Fighter C', gender: Gender.Female, win: 0 }, { name: 'Fighter D', gender: Gender.Female, win: 0 }]
 ]);
 
 export const duelsAtom = atom<ParticipantType[][][]>([])
 
-export const hitZonesDefault = {
-  head: 3,
-  torso: 2,
-  arms: 2,
-  legs: 1
-}
-
 export const hitZonesAtom = atom(hitZonesDefault);
 
 export const currentPairIndexAtom = atom(0); // Индекс текущей выбранной пары
+
+export const walletAddressAtom = atom("");

@@ -1,4 +1,4 @@
-import { ParticipantType } from "@/store";
+import { Gender, ParticipantType } from "@/store";
 
 export const generatePairs = (
     participants: ParticipantType[],
@@ -10,8 +10,8 @@ export const generatePairs = (
   const pairs: ParticipantType[][] = [];
 
   if (sameGenderOnly) {
-    const males = shuffled.filter((p) => p.gender === 'M');
-    const females = shuffled.filter((p) => p.gender === 'F');
+    const males = shuffled.filter((p) => p.gender === Gender.Male);
+    const females = shuffled.filter((p) => p.gender === Gender.Female);
 
     [males, females].forEach((group) => {
       for (let i = 0; i < group?.length - 1; i += 2) {
