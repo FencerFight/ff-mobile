@@ -3,11 +3,10 @@ import { GenderSwitch } from '@/components/GenderSwitch';
 import InputText from '@/components/InputText';
 import Section from '@/components/Section';
 import UniversalSelect from '@/components/UniversalSelect';
-import { FG, PRIVATE_KEY } from '@/constants';
-import { USER_ABI, USER_ADDRESS } from '@/constants/userContract';
+import { FG } from '@/constants';
 import { useContractCache } from '@/hooks/useContractCache';
-import { Gender, walletAddressAtom } from '@/store';
-import { useSetAtom } from 'jotai';
+import { Gender, userDataAtom } from '@/store';
+import { useAtom } from 'jotai';
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
@@ -18,7 +17,8 @@ import {
 } from 'react-native';
 
 export default function ProfileScreen() {
-  const { useContractQuery: useUserQuery, mutateData: mutateUserData, address } = useContractCache(USER_ADDRESS, USER_ABI, PRIVATE_KEY);
+  const [, setUserData] = useAtom(userDataAtom)
+  const { useContractQuery: useUserQuery, mutateData: mutateUserData, address } = useContractCache("user");
 
   /* --- Состояния --- */
   const [name, setName] = useState('');
@@ -27,21 +27,20 @@ export default function ProfileScreen() {
   const [cityId, setCityId] = useState<number | null>(null);
   const [countryId, setCountryId] = useState<number | null>(null);
   const [pending, setPending] = useState(false);
-  const setWalletAddress = useSetAtom(walletAddressAtom)
 
   /* --- Запросы данных --- */
-  const { data: userData } = useUserQuery<{name: string, rating: number, cityId: number, countryId: number, clubId: number}>('getUser', [address]);
+  const { data: user } = useUserQuery<{name: string, rating: number, cityId: number, countryId: number, clubId: number}>('getUser', [address]);
 
   /* --- Обновление состояния --- */
   useEffect(() => {
-    if (userData) {
-      setName(userData.name || '');
-      setCityId(userData.cityId || 0);
-      setCountryId(userData.countryId || 0);
-      setClubId(userData.clubId || 0);
+    if (user) {
+      setName(user.name || '');
+      setCityId(user.cityId || 0);
+      setCountryId(user.countryId || 0);
+      setClubId(user.clubId || 0);
     }
-    setWalletAddress(address)
-  }, [userData]);
+    setUserData(state=>({...state, wallet: address}))
+  }, [user]);
 
   /* --- Обработчики действий --- */
 const handleSave = async () => {

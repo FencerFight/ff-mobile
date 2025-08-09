@@ -10,10 +10,12 @@ import Toast from 'react-native-toast-message';
 
 import Button from '@/components/Button';
 import { GenderSwitch } from '@/components/GenderSwitch';
+import InputText from '@/components/InputText';
 import Section from '@/components/Section';
-import SwitchFF from '@/components/SwitchFF';
-import { ACCENT, ACCENT_TRANSPARENT, BG, FG, langLabels, PLACEHOLDER, STORAGE_PREFIX, SURFACE } from '@/constants';
+import Switch from '@/components/Switch';
+import { ACCENT, ACCENT_TRANSPARENT, BG, FG, langLabels, STORAGE_PREFIX, SURFACE } from '@/constants';
 import { useAppUpdate } from '@/hooks/useAppUpdate';
+import { useContractCache } from '@/hooks/useContractCache';
 import {
   currentPairIndexAtom,
   duelsAtom,
@@ -26,13 +28,17 @@ import {
   languageAtom,
   ParticipantType,
   sameGenderOnlyAtom,
-  soundsUpdateAtom
+  soundsUpdateAtom,
+  userDataAtom
 } from '@/store';
+import { TournamentInfo } from '@/typings';
 import { generatePairs } from '@/utils/generatePairs';
 import { onlySurname } from '@/utils/helpers';
 import I18n from '@utils/i18n';
 
 export default function SettingsScreen() {
+  const { useContractQuery } = useContractCache("tournament")
+  const { data: tournamentInfo } = useContractQuery<{ tournaments: TournamentInfo[], ids: bigint[]}>("getTournaments")
   /* ---------- атомы ---------- */
   const [fightTime, setFightTime] = useAtom(fightTimeAtom);
   const [hitZones, setHitZones] = useAtom(hitZonesAtom);
@@ -42,6 +48,7 @@ export default function SettingsScreen() {
   const [sameGenderOnly, setSameGenderOnly] = useAtom(sameGenderOnlyAtom);
   const [, setUpdateSounds] = useAtom(soundsUpdateAtom);
   const [, setDuels] = useAtom(duelsAtom);
+  const [userData, setUserData] = useAtom(userDataAtom)
   const { showUpdateBtn, applyUpdate } = useAppUpdate()
 
 
@@ -50,6 +57,7 @@ export default function SettingsScreen() {
   const [participants, setParticipants] = useState<ParticipantType[]>([]);
   const [gender, setGender] = useState<Gender>(Gender.Male);
   const [showPicker, setShowPicker] = useState(false);
+  const [currentTournamentIndex, setCurrentTournamentIndex] = useState(-1);
 
   /* ---------- загрузка ---------- */
   useEffect(() => {
@@ -111,7 +119,7 @@ export default function SettingsScreen() {
   const pickSound = async (type: 'bell' | 'warning') => {
     try {
       const res = await DocumentPicker.getDocumentAsync({ type: 'audio/*' });
-      if (res.assets[0].uri) {
+      if (!res.canceled) {
         await deleteCustomSounds(type)
         const fileType = res.assets[0].name.split(".")[1]
         const target = `${FileSystem.documentDirectory}${type}_custom.${fileType}`;
@@ -192,34 +200,8 @@ export default function SettingsScreen() {
   })();
   }, []);
 
-  return (
-    <ScrollView key={language}style={styles.container} contentContainerStyle={styles.content}>
-      {/* Кнопка смены языка */}
-      <View style={styles.langRow}>
-        <TouchableOpacity onPress={changeLang}>
-          <Text style={styles.langBtn}>{langLabels[language]}</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* --- 1. Участники --- */}
-      <Section title={I18n.t('participants')}>
-        <TextInput
-          placeholder={I18n.t('name')}
-          value={newName}
-          onChangeText={setNewName}
-          style={styles.input}
-          placeholderTextColor={PLACEHOLDER}
-          onSubmitEditing={addParticipant}
-          returnKeyType="done"
-        />
-
-        <GenderSwitch gender={gender} setGender={setGender} />
-
-        <Button style={styles.addBtn} onPress={addParticipant}>
-          <Plus size={28} color={FG} />
-        </Button>
-
-        {participants.map((p, idx) => (
+  const ParticipantsRows = ({ items }: {items: ParticipantType[] | Omit<ParticipantType, "win">[]}) => {
+    return items.map((p, idx) => (
           <View key={idx} style={styles.participantRow}>
             <Text style={styles.participantTxt}>{p.name}</Text>
             {p.gender === Gender.Male ?
@@ -230,7 +212,50 @@ export default function SettingsScreen() {
               <Trash2 size={22} color={FG} />
             </TouchableOpacity>
           </View>
-        ))}
+        ))
+  }
+
+  return (
+    <ScrollView key={language}style={styles.container} contentContainerStyle={styles.content}>
+      {/* Кнопка смены языка */}
+      <View style={styles.langRow}>
+        <TouchableOpacity onPress={changeLang}>
+          <Text style={styles.langBtn}>{langLabels[language]}</Text>
+        </TouchableOpacity>
+      </View>
+
+      {tournamentInfo?.tournaments.length ?
+      <Section title='Турниры'>
+        {tournamentInfo.tournaments.map((t, idx)=>
+          <Button
+          title={t.name}
+          key={idx}
+          stroke={currentTournamentIndex !== Number(tournamentInfo.ids[idx])}
+          onPress={()=>setCurrentTournamentIndex(Number(tournamentInfo.ids[idx]))}
+          />
+        )}
+      </Section>
+      :
+      <></>
+      }
+
+      {/* --- 1. Участники --- */}
+      <Section title={I18n.t('participants')}>
+        {currentTournamentIndex < 0 ?
+        <>
+        <InputText
+          placeholder={I18n.t('name')}
+          value={newName}
+          setValue={setNewName}
+        />
+
+        <GenderSwitch gender={gender} setGender={setGender} />
+
+        <Button style={styles.addBtn} onPress={addParticipant}>
+          <Plus size={28} color={FG} />
+        </Button>
+
+        <ParticipantsRows items={participants} />
 
         <View style={styles.genderRow}>
           <View style={[styles.genderRow, { marginVertical: 0 }]}>
@@ -243,7 +268,15 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        <SwitchFF title={I18n.t('sameGenderPairs')} value={sameGenderOnly} setValue={setSameGenderOnly} />
+        <Switch title={I18n.t('sameGenderPairs')} value={sameGenderOnly} setValue={setSameGenderOnly} />
+        </>
+        :
+        <>
+        {tournamentInfo?.tournaments[currentTournamentIndex].nominations.map((nom, idx)=>
+          <ParticipantsRows key={idx} items={nom.participants.map(p=>({ name: p, gender: nom.gender }))} />
+        )}
+        </>
+        }
 
         <Button style={{ marginTop: 10 }} onPress={genPairs} title={I18n.t('randomizePairs')} stroke />
       </Section>

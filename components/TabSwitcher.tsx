@@ -1,10 +1,11 @@
 // components/TabSwitcher.tsx
 import { ACCENT, BG, FG } from '@/constants'; // импортируйте свои цвета
 import React, { Children, ReactNode, useState } from 'react';
-import { ScrollView, StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 type TabSwitcherProps = {
-  tabs: string[]|ReactNode[];
+  tabs: string[]|React.JSX.Element[];
   children: ReactNode[];
   containerStyle?: StyleProp<ViewStyle>;
 };
@@ -25,9 +26,13 @@ export default function TabSwitcher({ tabs, children, containerStyle }: TabSwitc
           </TouchableOpacity>
         ))}
       </View>
-      <ScrollView style={styles.content}>
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.content}
+        enableOnAndroid
+        extraHeight={250}
+      >
         {Children.toArray(children)[activeTab]}
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </View>
   );
 }
@@ -59,5 +64,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
+    paddingBottom: 50,
+    flexGrow: 1
   },
 });

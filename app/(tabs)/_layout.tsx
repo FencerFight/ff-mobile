@@ -39,7 +39,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="tournament"
+        name="tournament/index"
         options={{
           tabBarIcon: ({ focused }) => <Swords size={28} color={focused ? ACCENT : FG} style={commonStyle} />,
         }}
@@ -62,6 +62,7 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => <Vote size={28} color={focused ? ACCENT : FG} style={commonStyle} />,
         }}
       />
+      <Tabs.Screen name="tournament/[id]" options={{ href: null }} />
     </Tabs>
   );
 }

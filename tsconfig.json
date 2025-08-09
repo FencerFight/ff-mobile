@@ -11,6 +11,7 @@
       "@constants/*": ["./constants/*"],
       "@store/*": ["./store/*"],
       "@assets/*": ["./assets/*"],
+      "@typings/*": ["./typings/*"],
 
     }
   },

@@ -6,13 +6,16 @@ import { StyleSheet, Text, View } from 'react-native';
 interface SectionProps {
   title?: string;
   children: React.ReactNode;
+  row?: boolean
 }
 
-export default function Section({ title, children }: SectionProps) {
+export default function Section({ title, children, row }: SectionProps) {
   return (
   <View style={styles.section}>
     {title && <Text style={styles.title}>{title}</Text>}
-    {children}
+    <View style={{ gap: 8, flexDirection: row ? "row" : "column", flexWrap: row ? "wrap" : "nowrap" }}>
+      {children}
+    </View>
   </View>
   )
 };

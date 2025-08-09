@@ -184,13 +184,13 @@ export const TOURNAMENT_ABI = [
           "type": "string"
         },
         {
-          "indexed": false,
+          "indexed": true,
           "internalType": "uint256",
           "name": "cityId",
           "type": "uint256"
         },
         {
-          "indexed": false,
+          "indexed": true,
           "internalType": "uint256",
           "name": "countryId",
           "type": "uint256"
@@ -244,6 +244,24 @@ export const TOURNAMENT_ABI = [
         }
       ],
       "name": "addJudge",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint8",
+          "name": "weaponTypeId",
+          "type": "uint8"
+        },
+        {
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        }
+      ],
+      "name": "addNomination",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -343,19 +361,14 @@ export const TOURNAMENT_ABI = [
           "type": "uint256"
         },
         {
-          "internalType": "uint256",
+          "internalType": "uint16",
           "name": "_startTime",
-          "type": "uint256"
+          "type": "uint16"
         },
         {
-          "internalType": "string[]",
-          "name": "_nominationNames",
-          "type": "string[]"
-        },
-        {
-          "internalType": "uint256[]",
-          "name": "_maxParticipants",
-          "type": "uint256[]"
+          "internalType": "bytes",
+          "name": "_nominationsPacked",
+          "type": "bytes"
         }
       ],
       "name": "createTournament",
@@ -365,6 +378,11 @@ export const TOURNAMENT_ABI = [
     },
     {
       "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
         {
           "internalType": "uint256",
           "name": "",
@@ -466,9 +484,9 @@ export const TOURNAMENT_ABI = [
     {
       "inputs": [
         {
-          "internalType": "uint256",
+          "internalType": "uint8",
           "name": "id",
-          "type": "uint256"
+          "type": "uint8"
         },
         {
           "internalType": "uint256",
@@ -479,19 +497,29 @@ export const TOURNAMENT_ABI = [
       "name": "getNomination",
       "outputs": [
         {
+          "internalType": "uint8",
+          "name": "",
+          "type": "uint8"
+        },
+        {
           "internalType": "string",
           "name": "",
           "type": "string"
         },
         {
-          "internalType": "uint256",
+          "internalType": "uint8",
           "name": "",
-          "type": "uint256"
+          "type": "uint8"
         },
         {
-          "internalType": "uint256",
+          "internalType": "address[]",
           "name": "",
-          "type": "uint256"
+          "type": "address[]"
+        },
+        {
+          "internalType": "enum UserRegistry.Gender",
+          "name": "",
+          "type": "uint8"
         }
       ],
       "stateMutability": "view",
@@ -500,9 +528,28 @@ export const TOURNAMENT_ABI = [
     {
       "inputs": [
         {
-          "internalType": "uint256",
+          "internalType": "uint8[]",
+          "name": "weaponIds",
+          "type": "uint8[]"
+        }
+      ],
+      "name": "getNominations",
+      "outputs": [
+        {
+          "internalType": "string[][]",
+          "name": "names",
+          "type": "string[][]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint8",
           "name": "nominationId",
-          "type": "uint256"
+          "type": "uint8"
         },
         {
           "internalType": "uint256",
@@ -528,6 +575,215 @@ export const TOURNAMENT_ABI = [
           "internalType": "struct Tournament.Pairs[]",
           "name": "",
           "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "tournamentId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getTournament",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "owner",
+              "type": "address"
+            },
+            {
+              "internalType": "string",
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "metadataCID",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "cityId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "countryId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "date",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint16",
+              "name": "startTime",
+              "type": "uint16"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint8",
+                  "name": "nameId",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "uint8",
+                  "name": "max",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "address[]",
+                  "name": "participants",
+                  "type": "address[]"
+                },
+                {
+                  "internalType": "uint8",
+                  "name": "weaponId",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "enum UserRegistry.Gender",
+                  "name": "gender",
+                  "type": "uint8"
+                }
+              ],
+              "internalType": "struct Tournament.Nomination[]",
+              "name": "nominations",
+              "type": "tuple[]"
+            },
+            {
+              "internalType": "address[]",
+              "name": "judges",
+              "type": "address[]"
+            }
+          ],
+          "internalType": "struct Tournament.TournamentInfo",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getTournaments",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "owner",
+              "type": "address"
+            },
+            {
+              "internalType": "string",
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "metadataCID",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "cityId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "countryId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "date",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint16",
+              "name": "startTime",
+              "type": "uint16"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint8",
+                  "name": "nameId",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "uint8",
+                  "name": "max",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "address[]",
+                  "name": "participants",
+                  "type": "address[]"
+                },
+                {
+                  "internalType": "uint8",
+                  "name": "weaponId",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "enum UserRegistry.Gender",
+                  "name": "gender",
+                  "type": "uint8"
+                }
+              ],
+              "internalType": "struct Tournament.Nomination[]",
+              "name": "nominations",
+              "type": "tuple[]"
+            },
+            {
+              "internalType": "address[]",
+              "name": "judges",
+              "type": "address[]"
+            }
+          ],
+          "internalType": "struct Tournament.TournamentInfo[]",
+          "name": "result",
+          "type": "tuple[]"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "ids",
+          "type": "uint256[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "hasJudges",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
         }
       ],
       "stateMutability": "view",
@@ -601,30 +857,6 @@ export const TOURNAMENT_ABI = [
           "type": "uint256"
         },
         {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "name": "judges",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        },
-        {
           "internalType": "uint256",
           "name": "",
           "type": "uint256"
@@ -655,25 +887,32 @@ export const TOURNAMENT_ABI = [
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "nominationId",
+          "name": "",
           "type": "uint256"
         },
         {
-          "components": [
-            {
-              "internalType": "address",
-              "name": "fighter1",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "fighter2",
-              "type": "address"
-            }
-          ],
-          "internalType": "struct Tournament.Pairs[]",
-          "name": "participant",
-          "type": "tuple[]"
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "nominationsNames",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "nominationId",
+          "type": "uint256"
         },
         {
           "internalType": "uint256",
@@ -758,9 +997,9 @@ export const TOURNAMENT_ABI = [
           "type": "uint256"
         },
         {
-          "internalType": "uint256",
+          "internalType": "uint16",
           "name": "startTime",
-          "type": "uint256"
+          "type": "uint16"
         }
       ],
       "stateMutability": "view",

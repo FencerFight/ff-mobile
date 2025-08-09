@@ -1,3 +1,6 @@
+import { TOURNAMENT_ABI, TOURNAMENT_ADDRESS } from "./tournamentContract";
+import { USER_ABI, USER_ADDRESS } from "./userContract";
+
 export const STORAGE_PREFIX = '@FencerFight_';
 export const ACCENT = '#FD5003';
 export const FG = '#FFFFFF';
@@ -19,4 +22,15 @@ export enum CategoriesSBT {
     CLUB_CATEGORY,
     CITY_CATEGORY,
     COUNTRY_CATEGORY,
+}
+
+export const contractType = {
+  tournament: {
+    address: TOURNAMENT_ADDRESS,
+    abi: TOURNAMENT_ABI
+  },
+  user: {
+    address: USER_ADDRESS,
+    abi: USER_ABI
+  }
 }

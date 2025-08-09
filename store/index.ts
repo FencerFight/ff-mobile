@@ -1,4 +1,5 @@
 // store.ts
+import { PRIVATE_KEY } from '@/constants';
 import { atom } from 'jotai';
 
 export const fightTimeDefault = 180;
@@ -46,4 +47,8 @@ export const hitZonesAtom = atom(hitZonesDefault);
 
 export const currentPairIndexAtom = atom(0); // Индекс текущей выбранной пары
 
-export const walletAddressAtom = atom("");
+export const userDataAtom = atom({
+  wallet: "",
+  privateKey: PRIVATE_KEY,
+  tournamentIds: []
+});

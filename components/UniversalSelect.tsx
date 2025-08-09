@@ -1,10 +1,8 @@
-import { ACCENT, PRIVATE_KEY } from "@/constants";
-import { USER_ABI, USER_ADDRESS } from "@/constants/userContract";
 import { useContractCache } from "@/hooks/useContractCache";
 import { useState } from "react";
-import { ScrollView } from "react-native";
 import Toast from "react-native-toast-message";
 import Button from "./Button";
+import HorizontalSelect from "./HorizontalSelect";
 import InputText from "./InputText";
 import Section from "./Section";
 
@@ -13,11 +11,11 @@ interface CountrySelectProps {
     id: number | null;
     pending: boolean;
     setPending: React.Dispatch<React.SetStateAction<boolean>>;
-    group: "country" | "city" | "club"
+    group: "country" | "city" | "club" | "weaponTypes"
 }
 
 export default function UniversalSelect({ setId, id, pending, setPending, group }:CountrySelectProps) {
-    const { useContractQuery, mutateData } = useContractCache(USER_ADDRESS, USER_ABI, PRIVATE_KEY)
+    const { useContractQuery, mutateData } = useContractCache("user")
 
     const keyData = {
         "country": {
@@ -43,6 +41,14 @@ export default function UniversalSelect({ setId, id, pending, setPending, group 
             title: "Клуб",
             create: "Добавить клуб",
             placeholder: "Название клуба"
+        },
+        "weaponTypes": {
+            getter: "getWeaponTypes",
+            setter: "addWeaponTypes",
+            message: "Введите название типа оружия",
+            title: "Тип оружия",
+            create: "Добавить тип оружия",
+            placeholder: "Название типа оружия"
         }
     }
     const { data: items = [], mutate: mutateItems } = useContractQuery<string[]>(keyData[group].getter);
@@ -82,17 +88,7 @@ export default function UniversalSelect({ setId, id, pending, setPending, group 
   };
     return (
         <Section title={keyData[group].title}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                {items.map((c, idx) => (
-                <Button
-                    key={idx}
-                    title={c}
-                    onPress={() => setId(idx)}
-                    style={[id === idx && { backgroundColor: ACCENT }, idx !== 0 && { marginLeft: 12 }]}
-                    stroke={idx !== id}
-                />
-                ))}
-            </ScrollView>
+            <HorizontalSelect id={id} setId={setId} items={items} />
             <InputText
                 placeholder={keyData[group].placeholder}
                 value={newName}

@@ -1,5 +1,5 @@
 import { ACCENT, FG } from "@/constants";
-import { StyleSheet, Switch, Text, View } from "react-native";
+import { Switch as ReactSwitch, StyleSheet, Text, View } from "react-native";
 
 interface SwitchFFProps {
     title: string;
@@ -7,11 +7,11 @@ interface SwitchFFProps {
     setValue: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function SwitchFF({ title, value, setValue }:SwitchFFProps) {
+export default function Switch({ title, value, setValue }:SwitchFFProps) {
     return (
         <View style={styles.switchRow}>
             <Text style={styles.switchLabel}>{title}</Text>
-            <Switch
+            <ReactSwitch
             value={value}
             onValueChange={setValue}
             trackColor={{ false: '#767577', true: ACCENT }}

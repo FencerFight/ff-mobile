@@ -1,11 +1,15 @@
+import { contractType } from '@/constants';
+import { userDataAtom } from '@/store';
 import { ethers } from 'ethers';
+import { useAtomValue } from 'jotai';
 import useSWR, { mutate } from 'swr';
 
-export function useContractCache(contract_address: string, abi: ethers.Interface | ethers.InterfaceAbi, private_key: string) {
+export function useContractCache(type: keyof typeof contractType) {
+  const userData = useAtomValue(userDataAtom)
   const RPC_URL = "http://192.168.0.9:8545"
   const provider = new ethers.JsonRpcProvider(RPC_URL);
-  const signer = new ethers.Wallet(private_key, provider);
-  const contract = new ethers.Contract(contract_address, abi, signer);
+  const signer = new ethers.Wallet(userData.privateKey, provider);
+  const contract = new ethers.Contract(contractType[type].address, contractType[type].abi, signer);
   const fetcher = async (method: string, ...args: any[]) => {
     try {
       const result = await contract[method](...args);
@@ -13,6 +17,9 @@ export function useContractCache(contract_address: string, abi: ethers.Interface
       if (method === 'getUser') {
         const [name, rating, cityId, countryId, clubId] = result;
         return { name, rating, cityId, countryId, clubId };
+      } else if (method === "getTournaments") {
+        const [tournaments, ids] = result;
+        return { tournaments, ids }
       }
 
       return result;

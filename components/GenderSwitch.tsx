@@ -5,7 +5,7 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 interface GenderSwitch {
     gender: Gender;
-    setGender: React.Dispatch<React.SetStateAction<Gender>>
+    setGender: (React.Dispatch<React.SetStateAction<Gender>>)|((g: Gender)=>void)
 }
 
 export function GenderSwitch({ gender, setGender }:GenderSwitch) {
