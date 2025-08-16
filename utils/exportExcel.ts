@@ -16,7 +16,7 @@ export async function exportExcel(
     wsData.push([`${i+1} ${I18n.t('stage')}`])
     wsData.push([I18n.t('name'), I18n.t('win'), I18n.t('win'), I18n.t('name')]);
     pair.forEach(([p1, p2]) => {
-        wsData.push([p1.name, p1.win.toString(), p2.win.toString(), p2.name]);
+        wsData.push([p1.name, p1.wins.toString(), p2.wins.toString(), p2.name]);
     })
 
     const ws = XLSX.utils.aoa_to_sheet(wsData);

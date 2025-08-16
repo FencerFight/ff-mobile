@@ -9,7 +9,7 @@ export function incWin(
       prev.map((pair, i) =>{
             if (pairIndex === i) {
                 return pair.map(p =>
-                    p.name === winnerName ? { ...p, win: p.win + 1 } : p
+                    p.name === winnerName ? { ...p, wins: p.wins + 1 } : p
                 )
             }
             return pair

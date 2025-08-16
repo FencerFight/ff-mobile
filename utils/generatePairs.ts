@@ -10,15 +10,15 @@ export const generatePairs = (
   const pairs: ParticipantType[][] = [];
 
   if (sameGenderOnly) {
-    const males = shuffled.filter((p) => p.gender === Gender.Male);
-    const females = shuffled.filter((p) => p.gender === Gender.Female);
+    const males = shuffled.filter((p) => p.gender === Gender.MALE);
+    const females = shuffled.filter((p) => p.gender === Gender.FEMALE);
 
     [males, females].forEach((group) => {
       for (let i = 0; i < group?.length - 1; i += 2) {
         pairs.push([group[i], group[i + 1]]);
       }
       if (group?.length % 2 !== 0) {
-        pairs.push([group[group.length - 1], { name: '—', gender: group[group.length - 1].gender, win: 0 }]);
+        pairs.push([group[group.length - 1], { name: '—', gender: group[group.length - 1].gender, wins: 0, address: "" }]);
       }
     });
     setFighterPairs(pairs);
@@ -29,7 +29,7 @@ export const generatePairs = (
       pairs.push([shuffled[i], shuffled[i + 1]]);
       }
       if (shuffled?.length % 2 !== 0) {
-        pairs.push([shuffled[shuffled.length - 1], { name: '—', gender: shuffled[shuffled.length - 1].gender, win: 0 } ]);
+        pairs.push([shuffled[shuffled.length - 1], { name: '—', gender: shuffled[shuffled.length - 1].gender, wins: 0, address: "" } ]);
       }
         setFighterPairs(pairs);
     }

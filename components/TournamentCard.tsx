@@ -10,16 +10,15 @@ interface TournamentCardProps {
   id: number;
   name: string;
   date: bigint;
-  startTime: bigint;
   city: string;
   country: string;
   metadataCID: string;
 }
 
-export default function TournamentCard({ id, name, date, startTime, country, city, metadataCID }: TournamentCardProps) {
+export default function TournamentCard({ id, name, date, country, city, metadataCID }: TournamentCardProps) {
   const metadata = decodeBase64<TournamentMetadata>(metadataCID)
   const dateStr = uint256ToDate(date).toLocaleDateString()
-  const time = getTime(startTime)
+  const time = getTime(metadata.startTime)
 
   return (
     <Link href={{ pathname: "/(tabs)/tournament/[id]", params: { id } }} asChild>

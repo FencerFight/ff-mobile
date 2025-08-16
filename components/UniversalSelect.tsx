@@ -11,7 +11,7 @@ interface CountrySelectProps {
     id: number | null;
     pending: boolean;
     setPending: React.Dispatch<React.SetStateAction<boolean>>;
-    group: "country" | "city" | "club" | "weaponTypes"
+    group: "country" | "city" | "club"
 }
 
 export default function UniversalSelect({ setId, id, pending, setPending, group }:CountrySelectProps) {
@@ -41,14 +41,6 @@ export default function UniversalSelect({ setId, id, pending, setPending, group 
             title: "Клуб",
             create: "Добавить клуб",
             placeholder: "Название клуба"
-        },
-        "weaponTypes": {
-            getter: "getWeaponTypes",
-            setter: "addWeaponTypes",
-            message: "Введите название типа оружия",
-            title: "Тип оружия",
-            create: "Добавить тип оружия",
-            placeholder: "Название типа оружия"
         }
     }
     const { data: items = [], mutate: mutateItems } = useContractQuery<string[]>(keyData[group].getter);

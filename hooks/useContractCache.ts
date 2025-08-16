@@ -20,6 +20,12 @@ export function useContractCache(type: keyof typeof contractType) {
       } else if (method === "getTournaments") {
         const [tournaments, ids] = result;
         return { tournaments, ids }
+      } else if (method === "getRatings") {
+        const [users, ratings] = result;
+        return { users, ratings }
+      } else if (method === "getAdmins") {
+        const [addresses, names] = result;
+        return { addresses, names }
       }
 
       return result;

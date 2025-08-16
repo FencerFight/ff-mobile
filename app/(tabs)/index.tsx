@@ -10,6 +10,7 @@ import Toast from 'react-native-toast-message';
 
 import Button from '@/components/Button';
 import { GenderSwitch } from '@/components/GenderSwitch';
+import HorizontalSelect from '@/components/HorizontalSelect';
 import InputText from '@/components/InputText';
 import Section from '@/components/Section';
 import Switch from '@/components/Switch';
@@ -17,7 +18,9 @@ import { ACCENT, ACCENT_TRANSPARENT, BG, FG, langLabels, STORAGE_PREFIX, SURFACE
 import { useAppUpdate } from '@/hooks/useAppUpdate';
 import { useContractCache } from '@/hooks/useContractCache';
 import {
+  currentNominationIdAtom,
   currentPairIndexAtom,
+  currentTournamentIdAtom,
   duelsAtom,
   fighterPairsAtom,
   fightTimeAtom,
@@ -28,8 +31,7 @@ import {
   languageAtom,
   ParticipantType,
   sameGenderOnlyAtom,
-  soundsUpdateAtom,
-  userDataAtom
+  soundsUpdateAtom
 } from '@/store';
 import { TournamentInfo } from '@/typings';
 import { generatePairs } from '@/utils/generatePairs';
@@ -37,8 +39,16 @@ import { onlySurname } from '@/utils/helpers';
 import I18n from '@utils/i18n';
 
 export default function SettingsScreen() {
-  const { useContractQuery } = useContractCache("tournament")
-  const { data: tournamentInfo } = useContractQuery<{ tournaments: TournamentInfo[], ids: bigint[]}>("getTournaments")
+  const [currentTournamentId, setCurrentTournamentId] = useAtom(currentTournamentIdAtom);
+  const [currentNominationId, setCurrentNominationId] = useAtom(currentNominationIdAtom);
+  const { useContractQuery: tournamentQuery } = useContractCache("tournament")
+  const { useContractQuery: userQuery } = useContractCache("user")
+  const { data: tournamentInfo } = tournamentQuery<{ tournaments: TournamentInfo[], ids: bigint[]}>("getTournaments")
+  const getTournamentIndex = () => tournamentInfo?.ids.findIndex(id=>Number(id) === currentTournamentId)!
+  const tournaments = tournamentInfo?.tournaments[getTournamentIndex()]
+  const nomination = tournaments?.nominations[currentNominationId.id < 0 ? 0 : currentNominationId.id]
+  const { data: nominationsNames } = tournamentQuery<string[][]>("getNominations", [tournaments?.nominations.map(n=>n.weaponId)])
+  const { data: names, mutate: mutateNames } = userQuery<string[]>("getNames", [nomination?.participants])
   /* ---------- атомы ---------- */
   const [fightTime, setFightTime] = useAtom(fightTimeAtom);
   const [hitZones, setHitZones] = useAtom(hitZonesAtom);
@@ -48,16 +58,14 @@ export default function SettingsScreen() {
   const [sameGenderOnly, setSameGenderOnly] = useAtom(sameGenderOnlyAtom);
   const [, setUpdateSounds] = useAtom(soundsUpdateAtom);
   const [, setDuels] = useAtom(duelsAtom);
-  const [userData, setUserData] = useAtom(userDataAtom)
   const { showUpdateBtn, applyUpdate } = useAppUpdate()
 
 
   /* ---------- состояние ---------- */
   const [newName, setNewName] = useState('');
   const [participants, setParticipants] = useState<ParticipantType[]>([]);
-  const [gender, setGender] = useState<Gender>(Gender.Male);
+  const [gender, setGender] = useState<Gender>(Gender.MALE);
   const [showPicker, setShowPicker] = useState(false);
-  const [currentTournamentIndex, setCurrentTournamentIndex] = useState(-1);
 
   /* ---------- загрузка ---------- */
   useEffect(() => {
@@ -95,14 +103,20 @@ export default function SettingsScreen() {
   const addParticipant = () => {
     const name = newName.trim();
     if (!name) return;
-    setParticipants([...participants, { name, gender, win: 0 }]);
+    setParticipants([...participants, { name, gender, wins: 0, address: "" }]);
     setNewName('');
   };
   const removeParticipant = (idx: number) =>
     setParticipants(participants.filter((_, i) => i !== idx));
 
   const genPairs = () => {
-    if (participants.length < 2) {
+    let newParticipants = participants
+
+    if (nomination && names) {
+      newParticipants = nomination.participants.map((addr, idx)=>({ name: names[idx], wins: 0, gender: Number(nomination.gender) as Gender, address: addr }))
+    }
+
+    if (newParticipants.length < 2) {
       Toast.show({
         type: 'error',
         text1: I18n.t('addTwoFighters'),
@@ -111,7 +125,7 @@ export default function SettingsScreen() {
     }
 
     setDuels([])
-    generatePairs(participants, sameGenderOnly, setFighterPairs, setCurrentPairIndex)
+    generatePairs(newParticipants, sameGenderOnly, setFighterPairs, setCurrentPairIndex)
 
   };
 
@@ -200,11 +214,11 @@ export default function SettingsScreen() {
   })();
   }, []);
 
-  const ParticipantsRows = ({ items }: {items: ParticipantType[] | Omit<ParticipantType, "win">[]}) => {
+  const ParticipantsRows = ({ items }: {items: ParticipantType[] | Omit<ParticipantType, "wins"|"address">[]}) => {
     return items.map((p, idx) => (
           <View key={idx} style={styles.participantRow}>
             <Text style={styles.participantTxt}>{p.name}</Text>
-            {p.gender === Gender.Male ?
+            {p.gender === Gender.MALE ?
               <Mars size={15} color={FG} style={{ marginLeft: -125}} /> :
               <Venus size={15} color={FG} style={{ marginLeft: -125}} />
             }
@@ -226,14 +240,12 @@ export default function SettingsScreen() {
 
       {tournamentInfo?.tournaments.length ?
       <Section title='Турниры'>
-        {tournamentInfo.tournaments.map((t, idx)=>
-          <Button
-          title={t.name}
-          key={idx}
-          stroke={currentTournamentIndex !== Number(tournamentInfo.ids[idx])}
-          onPress={()=>setCurrentTournamentIndex(Number(tournamentInfo.ids[idx]))}
-          />
-        )}
+        <HorizontalSelect id={currentTournamentId} ids={tournamentInfo.ids} setId={(idx)=>{setCurrentTournamentId(Number(tournamentInfo.ids[idx])); mutateNames()}} items={tournamentInfo.tournaments.map(t=>t.name)} />
+        {tournaments?.nominations.length && nominationsNames ?
+        <HorizontalSelect id={currentNominationId.id} ids={tournaments.nominations.map(nom=>nom.nameId)} setId={(idx)=>{setCurrentNominationId({ id: idx, weaponId: Number(tournaments!.nominations[idx].weaponId) }); mutateNames()}} items={tournaments.nominations.map(n=>nominationsNames![Number(n.weaponId)][Number(n.nameId)])} />
+        :
+        <></>
+        }
       </Section>
       :
       <></>
@@ -241,7 +253,7 @@ export default function SettingsScreen() {
 
       {/* --- 1. Участники --- */}
       <Section title={I18n.t('participants')}>
-        {currentTournamentIndex < 0 ?
+        {currentTournamentId < 0 ?
         <>
         <InputText
           placeholder={I18n.t('name')}
@@ -260,11 +272,11 @@ export default function SettingsScreen() {
         <View style={styles.genderRow}>
           <View style={[styles.genderRow, { marginVertical: 0 }]}>
             <Mars size={28} color={FG} />
-            <Text style={styles.countTxt}>{participants.filter(p => p.gender === Gender.Male).length}</Text>
+            <Text style={styles.countTxt}>{participants.filter(p => p.gender === Gender.MALE).length}</Text>
           </View>
           <View style={[styles.genderRow, { marginVertical: 0, marginLeft: 30 }]}>
             <Venus size={28} color={FG} />
-            <Text style={styles.countTxt}>{participants.filter(p => p.gender === Gender.Female).length}</Text>
+            <Text style={styles.countTxt}>{participants.filter(p => p.gender === Gender.FEMALE).length}</Text>
           </View>
         </View>
 
@@ -272,9 +284,10 @@ export default function SettingsScreen() {
         </>
         :
         <>
-        {tournamentInfo?.tournaments[currentTournamentIndex].nominations.map((nom, idx)=>
-          <ParticipantsRows key={idx} items={nom.participants.map(p=>({ name: p, gender: nom.gender }))} />
-        )}
+        {names && <ParticipantsRows
+                  items={names.map(name=>({ name, gender: Number(nomination!.gender) as Gender }))}
+                  />
+        }
         </>
         }
 

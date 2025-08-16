@@ -1,3 +1,5 @@
+import { ACHIEVEMENT_ABI, ACHIEVEMENT_ADDRESS } from "./achievementContract";
+import { GOVERNANCE_ABI, GOVERNANCE_ADDRESS } from "./governanceContract";
 import { TOURNAMENT_ABI, TOURNAMENT_ADDRESS } from "./tournamentContract";
 import { USER_ABI, USER_ADDRESS } from "./userContract";
 
@@ -13,7 +15,7 @@ export const ACCENT_TRANSPARENT = ACCENT + '33'
 export const langLabels: Record<string, string> = {
     en: 'EN',
     ru: 'RU',
-    zh: 'CN',
+    cn: 'CN',
 };
 
 export const PRIVATE_KEY = process.env.EXPO_PUBLIC_PRIVATE_KEY as string
@@ -32,5 +34,13 @@ export const contractType = {
   user: {
     address: USER_ADDRESS,
     abi: USER_ABI
+  },
+  governance: {
+    address: GOVERNANCE_ADDRESS,
+    abi: GOVERNANCE_ABI
+  },
+  achievement: {
+    address: ACHIEVEMENT_ADDRESS,
+    abi: ACHIEVEMENT_ABI
   }
 }

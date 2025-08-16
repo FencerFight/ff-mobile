@@ -1,5 +1,5 @@
 export const BADGES = [
-  { name: "Notofit",       description: "5 fights completed" },
+  { name: "Neophyte",       description: "5 fights completed" },
   { name: "Enthusiast",    description: "25 fights completed" },
   { name: "Adept",         description: "50 fights completed" },
   { name: "Fanatic",       description: "75 fights completed" },
@@ -17,12 +17,28 @@ export const ACHIEVEMENT_ABI = [
       "inputs": [
         {
           "internalType": "address",
-          "name": "tournament",
+          "name": "target",
           "type": "address"
         }
       ],
-      "stateMutability": "nonpayable",
-      "type": "constructor"
+      "name": "AddressEmptyCode",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "implementation",
+          "type": "address"
+        }
+      ],
+      "name": "ERC1967InvalidImplementation",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ERC1967NonPayable",
+      "type": "error"
     },
     {
       "inputs": [
@@ -128,6 +144,37 @@ export const ACHIEVEMENT_ABI = [
       "type": "error"
     },
     {
+      "inputs": [],
+      "name": "FailedCall",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidInitialization",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NotInitializing",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "UUPSUnauthorizedCallContext",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "slot",
+          "type": "bytes32"
+        }
+      ],
+      "name": "UUPSUnsupportedProxiableUUID",
+      "type": "error"
+    },
+    {
       "anonymous": false,
       "inputs": [
         {
@@ -226,6 +273,19 @@ export const ACHIEVEMENT_ABI = [
       "inputs": [
         {
           "indexed": false,
+          "internalType": "uint64",
+          "name": "version",
+          "type": "uint64"
+        }
+      ],
+      "name": "Initialized",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
           "internalType": "uint256",
           "name": "_tokenId",
           "type": "uint256"
@@ -258,6 +318,51 @@ export const ACHIEVEMENT_ABI = [
       ],
       "name": "Transfer",
       "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "implementation",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "UpgradeAuthorized",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "implementation",
+          "type": "address"
+        }
+      ],
+      "name": "Upgraded",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "UPGRADE_INTERFACE_VERSION",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
       "inputs": [
@@ -362,6 +467,24 @@ export const ACHIEVEMENT_ABI = [
       "inputs": [
         {
           "internalType": "address",
+          "name": "governance",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "tournament",
+          "type": "address"
+        }
+      ],
+      "name": "initialize",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
           "name": "owner",
           "type": "address"
         },
@@ -432,6 +555,45 @@ export const ACHIEVEMENT_ABI = [
           "internalType": "address",
           "name": "",
           "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "platformGovernance",
+      "outputs": [
+        {
+          "internalType": "contract IPlatformGovernance",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "platformGovernanceAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "proxiableUUID",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
         }
       ],
       "stateMutability": "view",
@@ -597,6 +759,24 @@ export const ACHIEVEMENT_ABI = [
       "inputs": [
         {
           "internalType": "address",
+          "name": "newImplementation",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "data",
+          "type": "bytes"
+        }
+      ],
+      "name": "upgradeToAndCall",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
           "name": "",
           "type": "address"
         },
@@ -607,25 +787,6 @@ export const ACHIEVEMENT_ABI = [
         }
       ],
       "name": "userAchievements",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "user",
-          "type": "address"
-        }
-      ],
-      "name": "userAchievementsCount",
       "outputs": [
         {
           "internalType": "uint256",

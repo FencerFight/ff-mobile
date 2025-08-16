@@ -1,3 +1,4 @@
+import Loader from "@/components/Loader";
 import Nominations from "@/components/Nominations";
 import TabSwitcher from "@/components/TabSwitcher";
 import TournamentPage from "@/components/TournamentPage";
@@ -6,13 +7,12 @@ import { useContractCache } from "@/hooks/useContractCache";
 import { TournamentInfo, TournamentMetadata } from "@/typings";
 import { decodeBase64, getTime, uint256ToDate } from "@/utils/helpers";
 import { useLocalSearchParams } from "expo-router";
-import { Info, Medal, UsersRound } from "lucide-react-native";
+import { Info, UsersRound } from "lucide-react-native";
 
 export default function TournamentInfoScreen() {
     const tabs = [
         <Info key={0} size={20} color={FG} />,
-        <UsersRound key={1} size={20} color={FG} />,
-        <Medal key={2} size={20} color={FG} />,
+        <UsersRound key={1} size={20} color={FG} />
     ]
     const { id } = useLocalSearchParams()
     const tournamentId = Number(id)
@@ -21,13 +21,13 @@ export default function TournamentInfoScreen() {
 
     const { data: cities } = useUserQuery<string[]>("getCities")
     const { data: countries } = useUserQuery<string[]>("getCountries")
-    const { data } = useTournamentQuery<TournamentInfo>("getTournament", [tournamentId])
+    const { data, mutate } = useTournamentQuery<TournamentInfo>("getTournament", [tournamentId])
     const { data: user } = useUserQuery<string[]>("getNames", [data?.owner ? [data?.owner] : []])
-    const { data: judges } = useUserQuery<string[]>("getNames", [data?.judges ? data.judges : []])
-    if (data === undefined) return <></>
+    const { data: judges = [] } = useUserQuery<string[]>("getNames", [data?.judges ? data.judges : []])
+    if (data === undefined || !judges.length) return <Loader />
     else {
-        if (judges === undefined) return <></>
         const metadata = decodeBase64<TournamentMetadata>(data!.metadataCID)
+        const date = uint256ToDate(data.date)
         return (
             <TabSwitcher tabs={tabs}>
                 <TournamentPage
@@ -37,14 +37,19 @@ export default function TournamentInfoScreen() {
                   description={metadata.description}
                   socialLinks={metadata.socialLinks}
                   image={metadata.image}
-                  date={uint256ToDate(data.date).toLocaleDateString()}
+                  date={date.toLocaleDateString()}
                   city={cities![Number(data.cityId)]}
                   country={countries![Number(data.countryId)]}
                   name={data.name}
-                  startTime={getTime(data.startTime)}
+                  startTime={getTime(metadata.startTime)}
                 />
-                <Nominations tournamentId={tournamentId} nominations={data.nominations} />
-                <></>
+                <Nominations
+                owner={data.owner}
+                date={date}
+                tournamentId={tournamentId}
+                nominations={data.nominations}
+                refreshCallback={mutate}
+                />
             </TabSwitcher>
         )
     }

@@ -11,10 +11,10 @@ export const hitZonesDefault = {
 }
 
 export enum Gender {
-  Male,
-  Female
+  MALE,
+  FEMALE
 }
-export type ParticipantType = { name: string; gender: Gender, win: number };
+export type ParticipantType = { name: string; gender: Gender, wins: number, address: string };
 
 // Основные атомы таймера
 export const fightTimeAtom = atom(fightTimeDefault); // Время боя в секундах (по умолчанию 3 минуты)
@@ -22,7 +22,7 @@ export const win1Atom = atom(0); // Очки первого бойца
 export const win2Atom = atom(0); // Очки второго бойца
 export const isRunningAtom = atom(false); // Состояние таймера (запущен/остановлен)
 export const timeLeftAtom = atom(fightTimeDefault); // Оставшееся время
-export const languageAtom = atom('en'); // Язык интерфейса ('en', 'ru', 'zh')
+export const languageAtom = atom<"en"|"ru"|"cn">('en'); // Язык интерфейса ('en', 'ru', 'cn')
 export const soundsUpdateAtom = atom(true); // Обновление звуков
 export const sameGenderOnlyAtom = atom(false); // Сортировка по полу
 
@@ -37,8 +37,8 @@ export const warnings2Atom = atom(0); // Счетчик предупрежден
 // Атомы для управления парами бойцов
 export const fighterPairsAtom = atom<ParticipantType[][]>([
   // Массив пар бойцов по умолчанию
-  [{ name: 'Fighter A', gender: Gender.Male, win: 0}, { name: 'Fighter B', gender: Gender.Male, win: 0 }],
-  [{ name: 'Fighter C', gender: Gender.Female, win: 0 }, { name: 'Fighter D', gender: Gender.Female, win: 0 }]
+  [{ name: 'Fighter A', gender: Gender.MALE, wins: 0, address: ""}, { name: 'Fighter B', gender: Gender.MALE, wins: 0, address: "" }],
+  [{ name: 'Fighter C', gender: Gender.FEMALE, wins: 0, address: "" }, { name: 'Fighter D', gender: Gender.FEMALE, wins: 0, address: "" }]
 ]);
 
 export const duelsAtom = atom<ParticipantType[][][]>([])
@@ -46,9 +46,15 @@ export const duelsAtom = atom<ParticipantType[][][]>([])
 export const hitZonesAtom = atom(hitZonesDefault);
 
 export const currentPairIndexAtom = atom(0); // Индекс текущей выбранной пары
+export const currentTournamentIdAtom = atom(-1)
+export const currentNominationIdAtom = atom({
+  id: -1,
+  weaponId: -1
+})
 
 export const userDataAtom = atom({
   wallet: "",
   privateKey: PRIVATE_KEY,
-  tournamentIds: []
+  tournamentIds: [],
+  gender: Gender.MALE
 });

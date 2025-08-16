@@ -12,7 +12,7 @@ export function useEvents<T = any>(
   type: keyof typeof contractType,
   eventName: string,
   filterArgs: any[] = [],
-  latestBlocks = 10
+  latestBlocks = 10000
 ) {
   const RPC_URL = 'http://192.168.0.9:8545';
   const provider = new ethers.JsonRpcProvider(RPC_URL);

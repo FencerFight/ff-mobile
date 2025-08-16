@@ -1,6 +1,7 @@
 import Button from '@/components/Button';
 import HorizontalSelect from '@/components/HorizontalSelect';
 import InputText from '@/components/InputText';
+import Loader from '@/components/Loader';
 import Switch from '@/components/Switch';
 import TabSwitcher from '@/components/TabSwitcher';
 import TournamentCard from '@/components/TournamentCard';
@@ -8,11 +9,13 @@ import TournamentForm from '@/components/TournamentForm';
 import { ACCENT, FG, SURFACE } from '@/constants';
 import { useContractCache } from '@/hooks/useContractCache';
 import { EventLog, useEvents } from '@/hooks/useEvents';
+import { languageAtom } from '@/store';
 import { TournamentCreatedEvent } from '@/typings';
 import { strMatch, uint256ToDate } from '@/utils/helpers';
+import { useAtomValue } from 'jotai';
 import { CalendarPlus2, LayoutList } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import DatePicker, { ColorOptions, RangeOutput, SingleOutput } from 'react-native-neat-date-picker';
 
 const colorOption: ColorOptions = {
@@ -28,10 +31,12 @@ export default function TournamentsScreen() {
   const [isShowFilters, setIsShowFilters] = useState(false)
   const [cityId, setCityId] = useState<number|null>(null)
   const [countryId, setCountryId] = useState<number|null>(null)
+  const [title, setTitle] = useState("")
+  const lang = useAtomValue(languageAtom)
   const { logs: tournamentCreatedLogs, loading, mutate } = useEvents<TournamentCreatedEvent>(
     "tournament",
     "TournamentCreated",
-    isShowFilters ? [null, null, cityId, countryId, null, null, null] : []
+    isShowFilters ? [null, null, cityId, countryId, null, null] : []
   )
   const { useContractQuery } = useContractCache("user")
   const { data: cities } = useContractQuery("getCities")
@@ -41,7 +46,6 @@ export default function TournamentsScreen() {
   const [dateFilter, setDateFilter] = useState<Date[]|null[]>([null, null])
   const [dateShow, setDateShow] = useState(false)
   const [dateFilterShow, setDateFilterShow] = useState(false)
-  const [title, setTitle] = useState("")
 
   const onConfirmSingle = (output: SingleOutput) => {
     setDateShow(false)
@@ -78,7 +82,7 @@ export default function TournamentsScreen() {
     <TabSwitcher tabs={tabs}>
         <View>
           {loading ?
-          <Text>Загрузка</Text>
+          <Loader />
           :
           <ScrollView>
             <Switch title='Фильтры' value={isShowFilters} setValue={setIsShowFilters} />
@@ -90,7 +94,8 @@ export default function TournamentsScreen() {
               <InputText placeholder='Название турнира' value={title} setValue={setTitle} />
             </View>
             }
-            {tournamentCreatedLogs.length && tournamentCreatedLogs.filter(filterPredicate).map((tournament, idx)=>(
+            {tournamentCreatedLogs.length ?
+              tournamentCreatedLogs.filter(filterPredicate).map((tournament, idx)=>(
               <TournamentCard
               key={idx}
               id={tournament.args.tournamentId}
@@ -99,9 +104,11 @@ export default function TournamentsScreen() {
               city={cities[Number(tournament.args.cityId)]}
               country={countries[Number(tournament.args.countryId)]}
               name={tournament.args.name}
-              startTime={tournament.args.startTime}
               />
-            ))}
+            ))
+            :
+            <></>
+            }
           </ScrollView>
           }
         </View>
@@ -113,6 +120,7 @@ export default function TournamentsScreen() {
         onCancel={()=>setDateFilterShow(false)}
         onConfirm={onConfirmRange}
         colorOptions={colorOption}
+        language={lang === "ru" ? "en" : lang}
       />
     {/* Для TournamentForm пришлось вынести поверх формы для нормального отображения */}
     <DatePicker

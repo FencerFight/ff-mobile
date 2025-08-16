@@ -11,10 +11,10 @@ interface GenderSwitch {
 export function GenderSwitch({ gender, setGender }:GenderSwitch) {
     return (
         <View style={styles.genderRow}>
-            <TouchableOpacity onPress={() => setGender(Gender.Male)} style={[styles.genderBtn, gender === Gender.Male && styles.genderActive]}>
+            <TouchableOpacity onPress={() => setGender(Gender.MALE)} style={[styles.genderBtn, gender === Gender.MALE && styles.genderActive]}>
                 <Mars size={28} color={FG} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setGender(Gender.Female)} style={[styles.genderBtn, gender === Gender.Female && styles.genderActive]}>
+            <TouchableOpacity onPress={() => setGender(Gender.FEMALE)} style={[styles.genderBtn, gender === Gender.FEMALE && styles.genderActive]}>
                 <Venus size={28} color={FG} />
             </TouchableOpacity>
         </View>

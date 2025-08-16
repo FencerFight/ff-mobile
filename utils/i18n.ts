@@ -68,7 +68,7 @@ const i18n = new I18n({
     newVersion: "Доступна новая версия приложения",
     updateBtn: "Кнопка обновления внизу настроек"
   },
-  zh: {
+  cn: {
     name: "姓名",
     fightDuration: "战斗持续时间",
     doubleHits: "相互影响",

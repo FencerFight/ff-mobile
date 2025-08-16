@@ -84,7 +84,7 @@ export default function TournamentPage({
 
       {socialLinks.length > 0 && (
         <Section title='Контакты' row>
-          {socialLinks.concat(["https://mywebsite.com/"]).map((link, i) => (
+          {socialLinks.map((link, i) => (
             <Pressable key={i} onPress={()=>Linking.openURL(link)} onLongPress={()=>copyText(link)} style={{ alignSelf: "center" }}>
               {iconFromLink(link) ? <Image source={iconFromLink(link)} style={{ width: 30, height: 30 }} /> : <Text style={styles.link}>{link}</Text>}
             </Pressable>

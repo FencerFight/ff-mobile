@@ -8,9 +8,10 @@ type TabSwitcherProps = {
   tabs: string[]|React.JSX.Element[];
   children: ReactNode[];
   containerStyle?: StyleProp<ViewStyle>;
+  onPresses?: (()=>void)[]
 };
 
-export default function TabSwitcher({ tabs, children, containerStyle }: TabSwitcherProps) {
+export default function TabSwitcher({ tabs, children, containerStyle, onPresses }: TabSwitcherProps) {
   const [activeTab, setActiveTab] = useState(0);
 
   return (
@@ -19,7 +20,7 @@ export default function TabSwitcher({ tabs, children, containerStyle }: TabSwitc
         {tabs.map((tab, idx) => (
           <TouchableOpacity
             key={idx}
-            onPress={() => setActiveTab(idx)}
+            onPress={() => { setActiveTab(idx); if (onPresses && onPresses[idx]) onPresses[idx]() }}
             style={[styles.tab, activeTab === idx && styles.activeTab]}
           >
             {typeof tab === "string" ? <Text style={styles.tabText}>{tab}</Text> : tab}

@@ -27,8 +27,7 @@ interface TournamentForm {
 }
 
 export default function TournamentForm({ date, setDateShow, refreshCallback }:TournamentForm ) {
-  const { mutateData } = useContractCache("tournament")
-  const { useContractQuery } = useContractCache("user")
+  const { useContractQuery, mutateData } = useContractCache("tournament")
   const { data: weaponTypes = [] } =  useContractQuery<string[]>("getWeaponTypes")
   const [name, setName] = useState('');
   const [cityId, setCityId] = useState<number| null>(null);
@@ -37,7 +36,7 @@ export default function TournamentForm({ date, setDateShow, refreshCallback }:To
   const [coverURL, setCoverURL] = useState('');
   const [socialLinks, setSocialLinks] = useState<string[]>(['']);
   type Nomination = { name: string; count: number, weaponId: number, gender: Gender }
-  const [nominations, setNominations] = useState<Nomination[]>([{ name: '', count: 8, weaponId: -1, gender: Gender.Male }]);
+  const [nominations, setNominations] = useState<Nomination[]>([{ name: '', count: 8, weaponId: -1, gender: Gender.MALE }]);
   const [startTime, setStartTime] = useState(180)
   const [startTimeShow, setStartTimeShow] = useState(false)
   const [image, setImage] = useState<{ uri: string, width: number, height: number } | null>(null);
@@ -51,7 +50,7 @@ export default function TournamentForm({ date, setDateShow, refreshCallback }:To
   };
   const removeSocial = (index: number) => setSocialLinks(prev => prev.filter((_, i) => i !== index));
 
-  const addNomination = () => setNominations(prev => [...prev, { name: '', count: 0, weaponId: -1, gender: Gender.Male }]);
+  const addNomination = () => setNominations(prev => [...prev, { name: '', count: 0, weaponId: -1, gender: Gender.MALE }]);
   const updateNomination = (index: number, field: keyof Nomination, value: string | number | Gender) => {
     const updated = [...nominations];
     updated[index] = { ...updated[index], [field]: value };
@@ -139,6 +138,7 @@ const handleCreate = async () => {
       description: desc,
       image: coverURL,
       socialLinks: validSocial,
+      startTime: BigInt(startTime)
     } as TournamentMetadata;
     const cid = encodeBase64(metadata);
     const abiCoder = new ethers.AbiCoder();
@@ -149,7 +149,6 @@ const handleCreate = async () => {
       cityId,
       countryId,
       dateToUint256(date),
-      startTime,
       abiCoder.encode(
         ["tuple(string,uint256,uint256,uint256,uint8)[]"],
         [nominations.map(nom=>[nom.name, nom.count, 0, nom.weaponId, nom.gender])]
@@ -159,8 +158,7 @@ const handleCreate = async () => {
     Toast.show({ type: 'success', text1: 'Турнир создан!' });
     await refreshCallback()
   } catch (e: any) {
-    Toast.show({ type: 'error', text1: e?.message || 'Ошибка транзакции' });
-    console.log(e?.message)
+    Toast.show({ type: 'error', text1: "Error", text2: e?.message });
   } finally {
     setPending(false);
   }
